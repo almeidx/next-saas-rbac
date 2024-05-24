@@ -1,0 +1,8 @@
+{
+	"name": "@acl/typescript-config",
+	"private": true,
+	"files": [
+		"library.json",
+		"node.json"
+	]
+}
