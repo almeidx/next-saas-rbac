@@ -1,13 +1,16 @@
 import { fastify } from "fastify";
-import { jsonSchemaTransform, serializerCompiler, validatorCompiler } from "fastify-type-provider-valibot";
+import { jsonSchemaTransform, serializerCompiler, validatorCompiler } from "fastify-type-provider-zod";
 import fastifySwagger from "@fastify/swagger";
 import fastifySwaggerUI from "@fastify/swagger-ui";
 import { createAccount } from "./routes/auth/create-account.js";
+import fastifySensible from "@fastify/sensible";
 
 const app = fastify();
 
 app.setSerializerCompiler(serializerCompiler);
-app.setValidatorCompiler(validatorCompiler());
+app.setValidatorCompiler(validatorCompiler);
+
+await app.register(fastifySensible);
 
 await app.register(fastifySwagger, {
 	openapi: {

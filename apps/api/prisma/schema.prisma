@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -16,7 +16,12 @@ model User {
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
 
-  tokens Token[]
+  tokens           Token[]
+  accounts         Account[]
+  invites          Invite[]
+  memberOn         Member[]
+  ownOrganizations Organization[]
+  ownProjects      Project[]
 
   @@map("users")
 }
@@ -24,7 +29,7 @@ model User {
 enum TokenType {
   PasswordRecover
 
-  @@map("enum_token_types")
+  @@map("token_types_enum")
 }
 
 model Token {
@@ -38,32 +43,96 @@ model Token {
   @@map("tokens")
 }
 
-model Account {
-  id String @id @default(uuid())
+enum AccountProvider {
+  GitHub
 
+  @@map("account_providers_enum")
+}
+
+model Account {
+  id                String          @id @default(uuid())
+  provider          AccountProvider
+  providerAccountId String          @unique @map("provider_account_id")
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @map("user_id")
+
+  @@unique([provider, userId])
   @@map("accounts")
 }
 
-model Invite {
-  id String @id @default(uuid())
+enum Role {
+  Admin
+  Member
 
+  @@map("roles_enum")
+}
+
+model Invite {
+  id        String   @id @default(uuid())
+  email     String
+  role      Role
+  createdAt DateTime @default(now()) @map("created_at")
+
+  author   User?   @relation(fields: [authorId], references: [id])
+  authorId String? @map("author_id")
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId String       @map("organization_id")
+
+  @@unique([email, organizationId])
+  @@index([email])
   @@map("invites")
 }
 
 model Member {
-  id String @id @default(uuid())
+  id   String @id @default(uuid())
+  role Role   @default(Member)
 
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId String       @map("organization_id")
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @map("user_id")
+
+  @@unique([organizationId, userId])
   @@map("members")
 }
 
 model Organization {
-  id String @id @default(uuid())
+  id                 String   @id @default(uuid())
+  name               String
+  slug               String   @unique
+  domain             String?  @unique
+  shouldAttachDomain Boolean  @default(false) @map("should_attach_domain")
+  avatarUrl          String?  @map("avatar_url")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @default(now()) @updatedAt @map("updated_at")
+
+  owner   User   @relation(fields: [ownerId], references: [id])
+  ownerId String @map("owner_id")
+
+  invites  Invite[]
+  members  Member[]
+  projects Project[]
 
   @@map("organizations")
 }
 
 model Project {
-  id String @id @default(uuid())
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  slug        String   @unique
+  avatarUrl   String?  @map("avatar_url")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+
+  owner   User   @relation(fields: [ownerId], references: [id])
+  ownerId String @map("owner_id")
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId String       @map("organization_id")
 
   @@map("projects")
 }

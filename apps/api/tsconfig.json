@@ -1,4 +1,9 @@
 {
 	"extends": "@acl/typescript-config/node.json",
-	"include": ["src/**/*"]
+	"include": ["src/**/*"],
+	"compilerOptions": {
+		"paths": {
+			"#lib/*": ["./src/lib/*"]
+		}
+	}
 }
