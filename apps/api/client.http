@@ -2,7 +2,22 @@ POST http://localhost:3000/users
 Content-Type: application/json
 
 {
-	"name": "johndoe",
-	"email": "johndoe@example.com",
+	"name": "almeida",
+	"email": "almeida@acme.com",
 	"password": "password"
 }
+
+###
+
+POST http://localhost:3000/sessions/password
+Content-Type: application/json
+
+{
+	"email": "almeida@acme.com",
+	"password": "password"
+}
+
+###
+
+GET http://localhost:3000/profile
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3OGYxYTlhNS03YzM4LTQxZDAtYTY0Zi01NjZkODIzYjU4M2MiLCJpYXQiOjE3MTY1NzI4NTQsImV4cCI6MTcxNzE3NzY1NH0.j6MIhOd1JB44n7duLHsnO8G6vF3H-yW9ok05UrawIvM

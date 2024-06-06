@@ -63,6 +63,7 @@ model Account {
 
 enum Role {
   Admin
+  Billing
   Member
 
   @@map("roles_enum")
